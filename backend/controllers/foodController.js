@@ -68,8 +68,14 @@ const addFood = async (req, res) => {
 
 // all food list
 const listFood = async (req, res) => {
+  const { category } = req.params;
   try {
-    const foods = await foodModel.find({});
+    let foods;
+    if (category) {
+      foods = await listFoodByCategory(category);
+    } else {
+      foods = await foodModel.find({});
+    }
     res.json({ success: true, data: foods });
   } catch (error) {
     console.log(error);
@@ -78,14 +84,13 @@ const listFood = async (req, res) => {
 };
 
 // list food by category
-const listFoodByCategory = async (req, res) => {
-  const { category } = req.body;
+const listFoodByCategory = async (category) => {
   try {
     const foods = await foodModel.find({ category });
-    res.json({ success: true, data: foods });
+    return foods;
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: "Error" });
+    throw error;
   }
 };
 
