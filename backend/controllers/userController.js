@@ -13,19 +13,22 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await userModel.findOne({ email });
-
     if (!user) {
       return res.json({ success: false, message: "User does not exist" });
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return res.json({ success: false, message: "Invalid credentials" });
     }
 
     const token = createToken(user._id);
-    res.json({ success: true, token });
+    res.cookie("session_token", token, {
+      httpOnly: true, // Prevents access from JavaScript
+      secure: true, // Use only in HTTPS
+      sameSite: "Strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+    res.json({ success: true });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
@@ -63,11 +66,44 @@ const registerUser = async (req, res) => {
     const newUser = new userModel({ name, email, password: hashedPassword });
     const user = await newUser.save();
     const token = createToken(user._id);
-    res.json({ success: true, token });
+    res.cookie("session_token", token, {
+      httpOnly: true, // Prevents access from JavaScript
+      secure: true, // Use only in HTTPS
+      sameSite: "Strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+    res.json({ success: true });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
-export { loginUser, registerUser };
+// Check Authentication Route
+const getProfile = async (req, res) => {
+  const { userId } = req.body;
+  try {
+    if (userId) {
+      const user = await userModel.findOne({ _id: userId });
+      return res.json({
+        success: true,
+        user: { _id: user._id, email: user.email, name: user.name },
+      });
+    }
+    res.json({ success: false, message: "Not authenticated" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
+const logOut = async (req, res) => {
+  res.clearCookie("session_token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+  });
+  res.json({ success: true, message: "Logged out" });
+};
+
+export { loginUser, registerUser, getProfile, logOut };
