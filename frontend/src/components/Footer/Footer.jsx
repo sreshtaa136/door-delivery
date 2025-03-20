@@ -1,6 +1,7 @@
 import React from "react";
 import "./Footer.css";
 import { assets } from "../../assets/assets";
+import { useLocation } from "react-router-dom";
 
 const Footer = () => {
   return (
