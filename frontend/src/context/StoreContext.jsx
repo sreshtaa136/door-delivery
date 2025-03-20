@@ -9,6 +9,7 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [user, setUser] = useState({});
+  const [showLogin, setShowLogin] = useState(false);
   const currency = "$";
   const deliveryCharge = 3;
 
@@ -38,6 +39,7 @@ const StoreContextProvider = (props) => {
         }
       } catch (error) {}
     }
+    console.log("getTotalCartAmount", totalAmount);
     return totalAmount;
   };
 
@@ -49,8 +51,8 @@ const StoreContextProvider = (props) => {
 
   const loadCartData = async () => {
     const response = await axios.get(`${url}/api/cart/`);
-    console.log("context cart: ", response.data.data);
-    setCartItems(response.data.cartData);
+    console.log("context cart: ", response.data.cartData);
+    setCartItems(response.data.cartData || {});
   };
 
   const getUser = async () => {
@@ -68,6 +70,7 @@ const StoreContextProvider = (props) => {
       await fetchFoodList();
       await loadCartData();
       await getUser();
+      // await getTotalCartAmount();
     }
     loadData();
   }, []);
@@ -87,6 +90,8 @@ const StoreContextProvider = (props) => {
     setCartItems,
     currency,
     deliveryCharge,
+    showLogin,
+    setShowLogin,
   };
 
   return (

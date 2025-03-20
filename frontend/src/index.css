@@ -23,6 +23,11 @@ a {
   margin: auto;
 }
 
+.popup {
+  height: 100vh;
+  overflow: hidden;
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;

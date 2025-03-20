@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/assets.js";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,8 +6,9 @@ import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const Navbar = ({ setShowLogin }) => {
-  const { getTotalCartAmount, user, setUser, url } = useContext(StoreContext);
+const Navbar = () => {
+  const { getTotalCartAmount, user, setUser, url, setShowLogin } =
+    useContext(StoreContext);
   const [menu, setMenu] = useState("home");
   const navigate = useNavigate();
   const logout = async () => {
