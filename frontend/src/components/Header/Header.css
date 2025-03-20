@@ -2,9 +2,12 @@
   height: 34vw;
   margin: 30px auto;
   background: url("/header_img.png") no-repeat;
-  background-size: contain;
+  background-size: cover;
   position: relative;
+  border-radius: 0.8em;
+  overflow: hidden;
 }
+
 .header-contents {
   position: absolute;
   display: flex;
@@ -12,28 +15,32 @@
   align-items: start;
   gap: 1.5vw;
   max-width: 50%;
-  bottom: 10%;
+  bottom: 12%;
   left: 6vw;
   animation: fadeIn 3s;
 }
+
 .header-contents h2 {
   font-weight: 500;
   color: white;
-  font-size: max(4.5vw, 22px);
+  font-size: max(4vw, 21px);
 }
+
 .header-contents p {
   color: white;
-  font-size: 1vw;
+  font-size: 1.2vw;
 }
+
 .header-contents button {
   border: none;
-  color: #747474;
+  color: #2f2f2f;
   font-weight: 500;
   padding: 1vw 2.3vw;
   background: white;
   font-size: max(1vw, 13px);
   border-radius: 50px;
 }
+
 @media (max-width: 1050px) {
   .header {
     height: 38vw;
@@ -42,6 +49,7 @@
     max-width: 45%;
   }
 }
+
 @media (max-width: 750px) {
   .header-contents {
     max-width: 55%;
