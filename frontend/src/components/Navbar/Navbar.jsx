@@ -5,9 +5,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
-  const { getTotalCartAmount, user, setUser, url, setShowLogin } =
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+  const { getTotalCartAmount, user, setUser, url, setShowLogin, emptyValues } =
     useContext(StoreContext);
   const [menu, setMenu] = useState("home");
   const navigate = useNavigate();
@@ -15,7 +18,9 @@ const Navbar = () => {
     setUser("");
     try {
       const response = await axios.post(`${url}/api/user/logout`, {});
-      window.location.reload();
+      emptyValues();
+      // window.location.reload();
+      navigate("/");
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong. Please try again later.");
@@ -27,36 +32,38 @@ const Navbar = () => {
       <Link to="/">
         <img className="logo" src={assets.logo} alt="doordel-logo" />
       </Link>
-      <ul className="navbar-menu">
-        <Link
-          to="/"
-          onClick={() => setMenu("home")}
-          className={`${menu === "home" ? "active" : ""}`}
-        >
-          home
-        </Link>
-        <a
-          href="#explore-menu"
-          onClick={() => setMenu("menu")}
-          className={`${menu === "menu" ? "active" : ""}`}
-        >
-          menu
-        </a>
-        <a
-          href="#app-download"
-          onClick={() => setMenu("mob-app")}
-          className={`${menu === "mob-app" ? "active" : ""}`}
-        >
-          mobile app
-        </a>
-        <a
-          href="#footer"
-          onClick={() => setMenu("contact")}
-          className={`${menu === "contact" ? "active" : ""}`}
-        >
-          contact us
-        </a>
-      </ul>
+      {isHome && (
+        <ul className="navbar-menu">
+          <Link
+            to="/"
+            onClick={() => setMenu("home")}
+            className={`${menu === "home" ? "active" : ""}`}
+          >
+            home
+          </Link>
+          <a
+            href="#explore-menu"
+            onClick={() => setMenu("menu")}
+            className={`${menu === "menu" ? "active" : ""}`}
+          >
+            menu
+          </a>
+          <a
+            href="#app-download"
+            onClick={() => setMenu("mob-app")}
+            className={`${menu === "mob-app" ? "active" : ""}`}
+          >
+            mobile app
+          </a>
+          <a
+            href="#footer"
+            onClick={() => setMenu("contact")}
+            className={`${menu === "contact" ? "active" : ""}`}
+          >
+            contact us
+          </a>
+        </ul>
+      )}
       <div className="navbar-right">
         {/* <img src={assets.search_icon} alt="search-icon" /> */}
         <Link to="/cart" className="navbar-search-icon">
@@ -69,7 +76,7 @@ const Navbar = () => {
           <div className="navbar-profile">
             <img src={assets.profile_icon} alt="profile-icon" />
             <ul className="navbar-profile-dropdown">
-              <li onClick={() => navigate("/myorders")}>
+              <li onClick={() => navigate("/my-orders")}>
                 {" "}
                 <img src={assets.bag_icon} alt="bag-icon" /> <p>Orders</p>
               </li>
