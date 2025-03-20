@@ -14,33 +14,59 @@ const StoreContextProvider = (props) => {
   const deliveryCharge = 3;
 
   const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+    setCartItems((prev) => {
+      const updatedQuantity = (prev[itemId] || 0) + 1;
+      return { ...prev, [itemId]: updatedQuantity };
+    });
+
+    try {
+      await axios.post(`${url}/api/cart/add`, { itemId });
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
     }
-    await axios.post(`${url}/api/cart/add`, { itemId });
   };
 
   const removeFromCart = async (itemId) => {
-    if (cartItems[itemId] > 0) {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setCartItems((prev) => {
+      if (!prev[itemId]) return prev; // Ensure item exists
+      const updatedQuantity = prev[itemId] - 1;
+      if (updatedQuantity === 0) {
+        // Remove the item completely
+        const newState = { ...prev };
+        delete newState[itemId];
+        return newState;
+      }
+      return { ...prev, [itemId]: updatedQuantity };
+    });
+
+    try {
+      await axios.post(`${url}/api/cart/remove`, { itemId });
+    } catch (error) {
+      console.error("Failed to remove item from cart:", error);
+      // Rollback UI if API call fails
+      setCartItems((prev) => ({
+        ...prev,
+        [itemId]: (prev[itemId] || 0) + 1, // Restore previous quantity
+      }));
     }
-    await axios.post(`${url}/api/cart/remove`, { itemId });
   };
 
-  const getTotalCartAmount = async () => {
+  const getTotalCartAmount = () => {
     let totalAmount = 0;
-    for (const item in cartItems) {
+    for (const itemId in cartItems) {
       try {
-        if (cartItems[item] > 0) {
-          let itemInfo = food_list.find((product) => product._id === item);
-          totalAmount += itemInfo.price * cartItems[item];
+        if (cartItems[itemId] > 0) {
+          let itemInfo = food_list.find((product) => product._id === itemId);
+          if (itemInfo) {
+            totalAmount += itemInfo.price * cartItems[itemId];
+          }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error calculating total:", error);
+      }
     }
-    console.log("getTotalCartAmount", totalAmount);
-    return totalAmount;
+    // console.log("getTotalCartAmount", totalAmount.toFixed(2));
+    return parseFloat(totalAmount.toFixed(2)); // Ensures it's a number
   };
 
   const fetchFoodList = async () => {

@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
 import Footer from "./components/Footer/Footer";
 import { StoreContext } from "./context/StoreContext";
+import Cart from "./pages/Cart/Cart";
 
 function App() {
   const { showLogin } = useContext(StoreContext);
@@ -19,6 +20,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </div>
       {!showLogin && <Footer />}

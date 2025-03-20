@@ -15,10 +15,14 @@ const FoodItem = ({ image, name, price, desc, id }) => {
           <img
             className="add"
             onClick={() => {
-              window.scrollTo({ top: 0 });
-              setTimeout(() => {
-                user ? addToCart(id) : setShowLogin(true);
-              }, 750);
+              if (user) {
+                addToCart(id);
+              } else {
+                window.scrollTo({ top: 0 });
+                setTimeout(() => {
+                  setShowLogin(true);
+                }, 750);
+              }
             }}
             src={assets.add_icon_white}
             alt="add_icon_white"
