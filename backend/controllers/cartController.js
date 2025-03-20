@@ -20,14 +20,21 @@ const addToCart = async (req, res) => {
 
 // remove food from user cart
 const removeFromCart = async (req, res) => {
+  const { itemId, userId } = req.body;
   try {
-    let userData = await userModel.findById(req.body.userId);
+    let userData = await userModel.findById(userId);
     let cartData = await userData.cartData;
-    if (cartData[req.body.itemId] > 0) {
-      cartData[req.body.itemId] -= 1;
+    if (!cartData[itemId]) {
+      return res.json({ success: false, message: "Error" });
     }
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData });
-    res.json({ success: true, message: "Removed From Cart" });
+
+    if (cartData[itemId] > 1) {
+      cartData[itemId] -= 1;
+    } else if (cartData[itemId] === 1) {
+      delete cartData[itemId];
+    }
+    await userModel.findByIdAndUpdate(userId, { cartData });
+    return res.json({ success: true, message: "Removed From Cart" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
