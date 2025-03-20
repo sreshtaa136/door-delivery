@@ -8,8 +8,9 @@ const StoreContextProvider = (props) => {
   const url = import.meta.env.VITE_API_URL;
   const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState("");
   const [showLogin, setShowLogin] = useState(false);
+  const [orders, setOrders] = useState("");
   const currency = "$";
   const deliveryCharge = 3;
 
@@ -91,6 +92,21 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${url}/api/order/user/${user._id}`);
+      setOrders(response.data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const emptyValues = () => {
+    setCartItems("");
+    setOrders("");
+    setUser("");
+  };
+
   useEffect(() => {
     async function loadData() {
       await fetchFoodList();
@@ -100,6 +116,12 @@ const StoreContextProvider = (props) => {
     }
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (user && !orders) {
+      fetchOrders();
+    }
+  }, [user]);
 
   const contextValue = {
     url,
@@ -118,6 +140,8 @@ const StoreContextProvider = (props) => {
     deliveryCharge,
     showLogin,
     setShowLogin,
+    orders,
+    emptyValues,
   };
 
   return (
