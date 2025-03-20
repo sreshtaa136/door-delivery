@@ -8,6 +8,7 @@ import LoginPopup from "./components/LoginPopup/LoginPopup";
 import Footer from "./components/Footer/Footer";
 import { StoreContext } from "./context/StoreContext";
 import Cart from "./pages/Cart/Cart";
+import MyOrders from "./pages/MyOrders/MyOrders";
 
 function App() {
   const { showLogin } = useContext(StoreContext);
@@ -17,13 +18,16 @@ function App() {
       <ToastContainer />
       {showLogin && <LoginPopup />}
       <div className={!showLogin ? "app" : "app popup"}>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/cart" element={<Cart />} />
-        </Routes>
+        <div className="app-content">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/my-orders" element={<MyOrders />} />
+          </Routes>
+        </div>
+        {!showLogin && <Footer />}
       </div>
-      {!showLogin && <Footer />}
     </>
   );
 }
