@@ -5,14 +5,14 @@ import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../assets/assets";
 
 const MyOrders = () => {
-  const { currency, orders } = useContext(StoreContext);
-
+  const { currency, orders, fetchOrders } = useContext(StoreContext);
+  
   return (
     <div className="my-orders">
       <h2>My Orders</h2>
       <div className="container">
-        {orders.length > 0 ? (
-          orders.map((order, index) => {
+        {orders?.length > 0 ? (
+          orders?.map((order, index) => {
             return (
               <div key={index} className="my-orders-order">
                 <img src={assets.parcel_icon} alt="" />
@@ -33,7 +33,7 @@ const MyOrders = () => {
                 <p>
                   <span>&#x25cf;</span> <b>{order.status}</b>
                 </p>
-                <button onClick={fetchOrders}>Track Order</button>
+                <button>Track Order</button>
               </div>
             );
           })

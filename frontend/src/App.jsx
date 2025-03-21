@@ -9,6 +9,7 @@ import Footer from "./components/Footer/Footer";
 import { StoreContext } from "./context/StoreContext";
 import Cart from "./pages/Cart/Cart";
 import MyOrders from "./pages/MyOrders/MyOrders";
+import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
 
 function App() {
   const { showLogin } = useContext(StoreContext);
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/order" element={<PlaceOrder />} />
           </Routes>
         </div>
         {!showLogin && <Footer />}

@@ -34,7 +34,7 @@ const LoginPopup = () => {
       loadCartData();
       getUser();
       setShowLogin(false);
-      toast.success("Successfully logged in");
+      toast.success("Successfully logged in", { autoClose: 500 });
     } else {
       toast.error(response.data.message);
     }

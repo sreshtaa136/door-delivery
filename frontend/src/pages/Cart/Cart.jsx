@@ -92,7 +92,11 @@ const Cart = () => {
               </b>
             </div>
           </div>
-          <button onClick={() => cartItems.size > 0 && navigate("/order")}>
+          <button
+            onClick={() =>
+              Object.keys(cartItems).length > 0 && navigate("/order")
+            }
+          >
             PROCEED TO CHECKOUT
           </button>
         </div>
