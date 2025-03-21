@@ -10,6 +10,7 @@ import { StoreContext } from "./context/StoreContext";
 import Cart from "./pages/Cart/Cart";
 import MyOrders from "./pages/MyOrders/MyOrders";
 import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
+import Verify from "./pages/Verify/Verify";
 
 function App() {
   const { showLogin } = useContext(StoreContext);
@@ -26,6 +27,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/order" element={<PlaceOrder />} />
+            <Route path='/verify' element={<Verify />}/>
           </Routes>
         </div>
         {!showLogin && <Footer />}
