@@ -28,7 +28,7 @@ const loginUser = async (req, res) => {
       sameSite: "Strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-    res.json({ success: true });
+    return res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Error" });
