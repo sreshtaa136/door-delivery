@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 // app config
 const app = express();
 const port = process.env.PORT || 4000;
-const allowedOrigins = process.env.UI_URLS.split(",");
+const allowedOrigins = process.env.UI_URLS ? process.env.UI_URLS.split(",") : [];
 
 // middlewares
 app.use(express.json());
