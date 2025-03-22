@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import "./MyOrders.css";
-import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../assets/assets";
 
 const MyOrders = () => {
-  const { currency, orders, fetchOrders } = useContext(StoreContext);
+  const { currency, orders } = useContext(StoreContext);
   
   return (
     <div className="my-orders">
