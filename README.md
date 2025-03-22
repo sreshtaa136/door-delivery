@@ -1,6 +1,4 @@
 # 🍲 DoorDel - Food Delivery Application
-<br>
-
 ## 📌 Overview
 
 **DoorDel** is a **food delivery web application** that allows users to:  
@@ -86,6 +84,7 @@ npm run dev
 <br>
 
 ## 🎯 Future Enhancements
+
 🔹 **Real-time order tracking** with WebSockets  
 🔹 **Admin dashboard** for managing food items & orders  
 🔹 **User reviews & ratings** for restaurants
