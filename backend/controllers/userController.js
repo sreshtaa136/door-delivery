@@ -25,7 +25,7 @@ const loginUser = async (req, res) => {
     res.cookie("session_token", token, {
       httpOnly: true, // Prevents access from JavaScript
       secure: true, // Use only in HTTPS
-      sameSite: "Strict",
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     return res.status(200).json({ success: true, message: "Login successful" });
