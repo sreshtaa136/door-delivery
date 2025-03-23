@@ -9,6 +9,7 @@ const Verify = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
+  const fromStripe = searchParams.get("fromStripe"); // Detect Stripe tab
 
   const navigate = useNavigate();
 
@@ -17,8 +18,18 @@ const Verify = () => {
       success,
       orderId,
     });
+    // if (response.data.success) {
+    //   navigate("/my-orders");
+    // } else {
+    //   navigate("/");
+    // }
+
+    if (fromStripe) {
+      window.close(); // Close the Stripe tab
+    }
+
     if (response.data.success) {
-      navigate("/my-orders");
+      navigate("/my-orders"); // Redirect in the main app
     } else {
       navigate("/");
     }

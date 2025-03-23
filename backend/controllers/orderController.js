@@ -48,8 +48,8 @@ const placeOrder = async (req, res) => {
 
     // represents customer’s session as they pay for one-time purchases
     const session = await stripe.checkout.sessions.create({
-      success_url: `${frontend_URL}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_URL}/verify?success=false&orderId=${newOrder._id}`,
+      success_url: `${frontend_URL}/verify?success=true&orderId=${newOrder._id}&fromStripe=true`,
+      cancel_url: `${frontend_URL}/verify?success=false&orderId=${newOrder._id}&fromStripe=true`,
       line_items: line_items,
       mode: "payment",
     });
