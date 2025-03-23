@@ -24,9 +24,9 @@ const Verify = () => {
     //   navigate("/");
     // }
 
-    if (fromStripe) {
-      window.close(); // Close the Stripe tab
-    }
+    // if (fromStripe) {
+    //   window.close(); // Close the Stripe tab
+    // }
 
     if (response.data.success) {
       navigate("/my-orders"); // Redirect in the main app

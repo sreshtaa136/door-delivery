@@ -62,7 +62,7 @@ const PlaceOrder = () => {
       if (response.data.success) {
         const { session_url } = response.data;
         // window.location.replace(session_url);
-        window.open(session_url, "_blank");
+        window.open(session_url, "_self");
       } else {
         toast.error("Something Went Wrong");
       }
