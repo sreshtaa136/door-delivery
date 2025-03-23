@@ -5,7 +5,7 @@ import { StoreContext } from "../../context/StoreContext";
 import "./Verify.css";
 
 const Verify = () => {
-  const { url } = useContext(StoreContext);
+  const { url, fetchOrders } = useContext(StoreContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
@@ -23,6 +23,7 @@ const Verify = () => {
     // } else {
     //   navigate("/");
     // }
+    fetchOrders();
 
     if (fromStripe) {
       window.close(); // Close the Stripe tab

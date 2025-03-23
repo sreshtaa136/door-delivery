@@ -10,15 +10,12 @@ const PlaceOrder = () => {
   axios.defaults.withCredentials = true; // Ensures cookies are sent with requests
   const navigate = useNavigate();
   const [payment, setPayment] = useState("cod");
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
+    name: "",
+    address: "",
     state: "",
-    zipcode: "",
-    country: "",
+    postcode: "",
     phone: "",
   });
 
@@ -40,7 +37,7 @@ const PlaceOrder = () => {
 
   const placeOrder = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     let orderItems = [];
     food_list.map((item) => {
       if (cartItems[item._id] > 0) {
@@ -58,13 +55,23 @@ const PlaceOrder = () => {
     };
 
     if (payment === "stripe") {
-      let response = await axios.post(url + "/api/order/place", orderData);
-      if (response.data.success) {
-        const { session_url } = response.data;
-        // window.location.replace(session_url);
-        window.open(session_url, "_blank");
-      } else {
-        toast.error("Something Went Wrong");
+      let newOrder = await axios.post(url + "/api/order/create", orderData);
+      if (newOrder.data.success && newOrder.data.orderId) {
+        let response = await axios.post(url + "/api/order/place", {
+          ...orderData,
+          orderId: newOrder.data.orderId,
+        });
+        if (response.data.success) {
+          const { session_url } = response.data;
+          // window.location.replace(session_url);
+          // start checking
+          window.open(session_url, "_blank");
+          // Start checking order status
+          checkOrderStatus(newOrder.data.orderId);
+        } else {
+          setLoading(false);
+          toast.error("Something Went Wrong");
+        }
       }
     } else {
       let response = await axios.post(url + "/api/order/placecod", orderData);
@@ -75,54 +82,58 @@ const PlaceOrder = () => {
       } else {
         toast.error("Something Went Wrong");
       }
+      setLoading(false);
     }
   };
 
+  // function to poll order status
+  const checkOrderStatus = (orderId) => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await axios.get(`${url}/api/order/${orderId}`);
+        const status = response.data.data.status;
+        if (
+          status &&
+          (status === "Food Preparing" || status === "Payment failed")
+        ) {
+          clearInterval(interval); // Stop polling
+          setCartItems({});
+          navigate("/my-orders"); // Redirect user
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error checking order status:", error);
+        clearInterval(interval); // Stop polling
+      }
+    }, 3000); // Check every 3 seconds
+    setCartItems({});
+  };
+
   return (
-    <form onSubmit={placeOrder} className="place-order">
-      <div className="place-order-left">
-        <p className="title">Delivery Information</p>
-        <div className="multi-field">
-          <input
-            type="text"
-            name="firstName"
-            onChange={onChangeHandler}
-            value={data.firstName}
-            placeholder="First name"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            onChange={onChangeHandler}
-            value={data.lastName}
-            placeholder="Last name"
-            required
-          />
+    <>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="spinner"></div>
+          <p>Processing Payment...</p>
         </div>
-        <input
-          type="email"
-          name="email"
-          onChange={onChangeHandler}
-          value={data.email}
-          placeholder="Email address"
-          required
-        />
-        <input
-          type="text"
-          name="street"
-          onChange={onChangeHandler}
-          value={data.street}
-          placeholder="Street"
-          required
-        />
-        <div className="multi-field">
+      )}
+      <form onSubmit={placeOrder} className="place-order">
+        <div className="place-order-left">
+          <p className="title">Delivery Information</p>
           <input
             type="text"
-            name="city"
+            name="name"
             onChange={onChangeHandler}
-            value={data.city}
-            placeholder="City"
+            value={data.name}
+            placeholder="Name"
+            required
+          />
+          <input
+            type="text"
+            name="address"
+            onChange={onChangeHandler}
+            value={data.address}
+            placeholder="Address"
             required
           />
           <input
@@ -133,103 +144,96 @@ const PlaceOrder = () => {
             placeholder="State"
             required
           />
-        </div>
-        <div className="multi-field">
           <input
             type="text"
-            name="zipcode"
+            name="postcode"
             onChange={onChangeHandler}
-            value={data.zipcode}
-            placeholder="Zip code"
+            value={data.postcode}
+            placeholder="Post code"
             required
           />
           <input
             type="text"
-            name="country"
+            name="phone"
             onChange={onChangeHandler}
-            value={data.country}
-            placeholder="Country"
+            value={data.phone}
+            placeholder="Phone"
             required
           />
         </div>
-        <input
-          type="text"
-          name="phone"
-          onChange={onChangeHandler}
-          value={data.phone}
-          placeholder="Phone"
-          required
-        />
-      </div>
-      <div className="place-order-right">
-        <div className="cart-total">
-          <h2>Cart Total</h2>
-          <div>
-            <div className="cart-total-details">
-              <p>Subtotal</p>
+        <div className="place-order-right">
+          <div className="cart-total">
+            <h2>Cart Total</h2>
+            <div>
+              <div className="cart-total-details">
+                <p>Subtotal</p>
+                <p>
+                  {currency}
+                  {getTotalCartAmount()}
+                </p>
+              </div>
+              <hr />
+              <div className="cart-total-details">
+                <p>Delivery Fee</p>
+                <p>
+                  {currency}
+                  {getTotalCartAmount() === 0 ? 0 : deliveryCharge}
+                </p>
+              </div>
+              <hr />
+              <div className="cart-total-details">
+                <b>Total</b>
+                <b>
+                  {currency}
+                  {getTotalCartAmount() === 0
+                    ? 0
+                    : (getTotalCartAmount() + deliveryCharge).toFixed(2)}
+                </b>
+              </div>
+            </div>
+          </div>
+          <div className="payment">
+            <h2>Payment Method</h2>
+            <div onClick={() => setPayment("cod")} className="payment-option">
+              <img
+                src={payment === "cod" ? assets.checked : assets.un_checked}
+                alt=""
+              />
+              <p>COD ( Cash on delivery )</p>
+            </div>
+            <div
+              onClick={() => setPayment("stripe")}
+              className="payment-option"
+            >
+              <img
+                src={payment === "stripe" ? assets.checked : assets.un_checked}
+                alt=""
+              />
+              <p>Stripe ( Credit/Debit )</p>
+            </div>
+          </div>
+          {payment === "stripe" && (
+            <div className="dummy-details">
               <p>
-                {currency}
-                {getTotalCartAmount()}
+                Provide the following dummy card details to test interactively:
+              </p>
+              <p>
+                <b>Card number:</b> 4242 4242 4242 4242
+              </p>
+              <p>
+                <b>Expiry:</b> Use a valid future date, such as 12/34.
+              </p>
+              <p>
+                <b>CVV:</b> Use any three digit number
               </p>
             </div>
-            <hr />
-            <div className="cart-total-details">
-              <p>Delivery Fee</p>
-              <p>
-                {currency}
-                {getTotalCartAmount() === 0 ? 0 : deliveryCharge}
-              </p>
-            </div>
-            <hr />
-            <div className="cart-total-details">
-              <b>Total</b>
-              <b>
-                {currency}
-                {getTotalCartAmount() === 0
-                  ? 0
-                  : (getTotalCartAmount() + deliveryCharge).toFixed(2)}
-              </b>
-            </div>
-          </div>
+          )}
+          <button className="place-order-submit" type="submit">
+            {payment === "cod" ? "Place Order" : "Proceed To Payment"}
+          </button>
         </div>
-        <div className="payment">
-          <h2>Payment Method</h2>
-          <div onClick={() => setPayment("cod")} className="payment-option">
-            <img
-              src={payment === "cod" ? assets.checked : assets.un_checked}
-              alt=""
-            />
-            <p>COD ( Cash on delivery )</p>
-          </div>
-          <div onClick={() => setPayment("stripe")} className="payment-option">
-            <img
-              src={payment === "stripe" ? assets.checked : assets.un_checked}
-              alt=""
-            />
-            <p>Stripe ( Credit/Debit )</p>
-          </div>
-        </div>
-        {payment === "stripe" && (
-          <div className="dummy-details">
-            <p>
-              Provide the following dummy card details to test interactively:
-            </p>
-            <p>
-              <b>Card number:</b> 4242 4242 4242 4242
-            </p>
-            <p>
-              <b>Expiry:</b> Use a valid future date, such as 12/34.
-            </p>
-            <p>
-              <b>CVV:</b> Use any three digit number
-            </p>
-          </div>
-        )}
-        <button className="place-order-submit" type="submit">
-          {payment === "cod" ? "Place Order" : "Proceed To Payment"}
-        </button>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 
