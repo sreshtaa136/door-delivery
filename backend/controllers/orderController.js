@@ -8,8 +8,8 @@ const currency = "aud";
 const deliveryCharge = 3;
 const frontend_URL = process.env.REDIRECT_URL;
 
-// Placing User Order for Frontend using stripe
-const placeOrder = async (req, res) => {
+// create order
+const createOrder = async (req, res) => {
   try {
     const newOrder = new orderModel({
       userId: req.body.userId,
@@ -20,7 +20,16 @@ const placeOrder = async (req, res) => {
     await newOrder.save();
     // empty the cart
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+    res.json({ success: true, orderId: newOrder._id});
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
 
+// Placing User Order for Frontend using stripe
+const placeOrder = async (req, res) => {
+  try {
     // list of items the customer is purchasing
     // required for stripe
     const line_items = req.body.items.map((item) => ({
@@ -48,8 +57,8 @@ const placeOrder = async (req, res) => {
 
     // represents customer’s session as they pay for one-time purchases
     const session = await stripe.checkout.sessions.create({
-      success_url: `${frontend_URL}/verify?success=true&orderId=${newOrder._id}&fromStripe=true`,
-      cancel_url: `${frontend_URL}/verify?success=false&orderId=${newOrder._id}&fromStripe=true`,
+      success_url: `${frontend_URL}/verify?success=true&orderId=${req.body.orderId}&fromStripe=true`,
+      cancel_url: `${frontend_URL}/verify?success=false&orderId=${req.body.orderId}&fromStripe=true`,
       line_items: line_items,
       mode: "payment",
     });
@@ -70,6 +79,7 @@ const placeOrderCod = async (req, res) => {
       amount: req.body.amount,
       address: req.body.address,
       payment: true,
+      status: "Food Preparing",
     });
     await newOrder.save();
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
@@ -104,6 +114,18 @@ const userOrders = async (req, res) => {
   }
 };
 
+// User Orders for Frontend
+const getOrder = async (req, res) => {
+  const { oid } = req.params;
+  try {
+    const order = await orderModel.findById(oid);
+    res.json({ success: true, data: order });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error" });
+  }
+};
+
 const updateStatus = async (req, res) => {
   // console.log(req.body);
   try {
@@ -120,10 +142,17 @@ const verifyOrder = async (req, res) => {
   const { orderId, success } = req.body;
   try {
     if (success === "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      await orderModel.findByIdAndUpdate(orderId, {
+        payment: true,
+        status: "Food Preparing",
+      });
       res.json({ success: true, message: "Paid" });
     } else {
-      await orderModel.findByIdAndDelete(orderId);
+      // await orderModel.findByIdAndDelete(orderId);
+      await orderModel.findByIdAndUpdate(orderId, {
+        payment: false,
+        status: "Payment failed",
+      });
       res.json({ success: false, message: "Not Paid" });
     }
   } catch (error) {
@@ -138,4 +167,6 @@ export {
   updateStatus,
   verifyOrder,
   placeOrderCod,
+  createOrder,
+  getOrder
 };
