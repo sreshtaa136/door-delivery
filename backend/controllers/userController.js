@@ -30,7 +30,7 @@ const loginUser = async (req, res) => {
     });
     return res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -74,7 +74,7 @@ const registerUser = async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -92,7 +92,7 @@ const getProfile = async (req, res) => {
     }
     res.json({ success: false, message: "Not authenticated" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };

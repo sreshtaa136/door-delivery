@@ -20,9 +20,9 @@ const createOrder = async (req, res) => {
     await newOrder.save();
     // empty the cart
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
-    res.json({ success: true, orderId: newOrder._id});
+    res.json({ success: true, orderId: newOrder._id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -65,7 +65,7 @@ const placeOrder = async (req, res) => {
 
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -86,7 +86,7 @@ const placeOrderCod = async (req, res) => {
 
     res.json({ success: true, message: "Order Placed" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -97,7 +97,7 @@ const listOrders = async (req, res) => {
     const orders = await orderModel.find({});
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -109,7 +109,7 @@ const userOrders = async (req, res) => {
     const orders = await orderModel.find({ userId: uid });
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -121,13 +121,12 @@ const getOrder = async (req, res) => {
     const order = await orderModel.findById(oid);
     res.json({ success: true, data: order });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.json({ success: false, message: "Error" });
   }
 };
 
 const updateStatus = async (req, res) => {
-  // console.log(req.body);
   try {
     await orderModel.findByIdAndUpdate(req.body.orderId, {
       status: req.body.status,
@@ -168,5 +167,5 @@ export {
   verifyOrder,
   placeOrderCod,
   createOrder,
-  getOrder
+  getOrder,
 };

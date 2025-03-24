@@ -66,26 +66,25 @@ const StoreContextProvider = (props) => {
         console.error("Error calculating total:", error);
       }
     }
-    // console.log("getTotalCartAmount", totalAmount.toFixed(2));
     return parseFloat(totalAmount.toFixed(2)); // Ensures it's a number
   };
 
   const fetchFoodList = async () => {
     const response = await axios.get(`${url}/api/food/list`);
-    console.log("context foods: ", response.data.data);
+    // console.log("context foods: ", response.data.data);
     setFoodList(response.data.data);
   };
 
   const loadCartData = async () => {
     const response = await axios.get(`${url}/api/cart/`);
-    console.log("context cart: ", response.data.cartData);
+    // console.log("context cart: ", response.data.cartData);
     setCartItems(response.data.cartData || {});
   };
 
   const getUser = async () => {
     try {
       const response = await axios.get(`${url}/api/user/profile`);
-      console.log("context user: ", response.data.user);
+      // console.log("context user: ", response.data.user);
       setUser(response.data.user);
     } catch (error) {
       console.error(error);
